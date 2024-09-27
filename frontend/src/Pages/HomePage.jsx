@@ -1,109 +1,226 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
 import {
-  Card,
-  CardContent,
-  Typography,
-  Button,
-  Box,
   Container,
+  Box,
+  Button,
+  Collapse,
+  TextField,
+  MenuItem,
+  FormControl,
+  Select,
+  InputLabel,
 } from "@mui/material";
-import axios from "axios";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import EventCard from "../components/EventCard"; // Import the EventCard component
+import axios from "axios"; // Import axios
+import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
+import dayjs from "dayjs";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 const HomePage = () => {
   const [events, setEvents] = useState([]);
+  const [filteredEvents, setFilteredEvents] = useState([]);
+  const [filterOpen, setFilterOpen] = useState(false); // For collapsing filter
+  const [calendarOpen, setCalendarOpen] = useState(false); // For calendar visibility
+  const [searchText, setSearchText] = useState(""); // For filtering by name
+  const [sortCriteria, setSortCriteria] = useState(""); // For sorting
+  const [selectedDate, setSelectedDate] = useState(null); // For selected date
+
+  const calendarRef = useRef(null); // To track clicks outside calendar
 
   useEffect(() => {
     axios
       .get("http://localhost:5000/api/events")
-      .then((response) => setEvents(response.data))
+      .then((response) => {
+        setEvents(response.data);
+        setFilteredEvents(response.data); // Initially display all events
+      })
       .catch((error) => console.log(error));
   }, []);
 
+  useEffect(() => {
+    // Click outside to close calendar
+    const handleClickOutside = (event) => {
+      if (calendarRef.current && !calendarRef.current.contains(event.target)) {
+        setCalendarOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [calendarRef]);
+
+  // Handle date selection from the calendar
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+    filterByDate(date); // Call the filter function after date selection
+  };
+
+  // Function to handle filtering based on search input
+  const handleSearchChange = (e) => {
+    const search = e.target.value.toLowerCase();
+    setSearchText(search);
+
+    const filtered = events.filter((event) =>
+      event.name.toLowerCase().includes(search)
+    );
+    setFilteredEvents(filtered);
+  };
+
+  // Function to handle sorting based on user selection
+  const handleSortChange = (e) => {
+    const criteria = e.target.value;
+    setSortCriteria(criteria);
+
+    let sortedEvents = [...filteredEvents]; // Create a copy of the filtered events
+    if (criteria === "date") {
+      sortedEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
+    } else if (criteria === "price") {
+      sortedEvents.sort((a, b) => a.price - b.price);
+    }
+
+    setFilteredEvents(sortedEvents);
+  };
+
+  // Function to filter events by the selected date
+  const filterByDate = (date) => {
+    const filtered = events.filter((event) =>
+      dayjs(event.date).isSame(dayjs(date), "day")
+    );
+    setFilteredEvents(filtered);
+  };
+
   return (
-    <Container
-      maxWidth="lg"
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        flexDirection: "column",
-        minHeight: "100vh",
-        maxWidth: "1366px", // set max-width
-        margin: "0 auto", // ensure the content is centered
-      }}
-    >
-      {events.map((event) => (
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <Container
+        maxWidth="lg"
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "100vh",
+          maxWidth: "1366px",
+          margin: "0 auto",
+          padding: "20px",
+        }}
+      >
+        {/* Filter and Sort Section */}
         <Box
-          key={event.id}
           sx={{
-            width: "100%", // full width of the container
-            maxWidth: "1366px", // ensure no card exceeds this width
-            marginBottom: "20px", // add some spacing between cards
+            marginBottom: 4,
+            width: "100%",
+            display: "flex",
+            alignItems: "center", // Align vertically center
+            gap: 2, // Gap between elements
+            flexDirection: "row", // Align horizontally
           }}
         >
-          <Card
+          {/* Filter Button */}
+          <Button
+            onClick={() => {
+              setFilterOpen(!filterOpen);
+              setCalendarOpen(false); // Ensure calendar is closed
+            }}
+            endIcon={<ExpandMoreIcon />}
+          >
+            Filter
+          </Button>
+
+          {/* Calendar Icon */}
+          <Button
+            onClick={() => {
+              setCalendarOpen(!calendarOpen);
+              setFilterOpen(false); // Ensure filter is closed
+            }}
+            endIcon={<CalendarMonthIcon />}
+          ></Button>
+        </Box>
+
+        {/* Calendar Popup */}
+        <Collapse in={calendarOpen}>
+          <Box
+            ref={calendarRef}
             sx={{
-              mx: "auto",
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
+              position: "absolute",
+              left: "0", // Appear to the left of the HomePage
+              top: "150px",
+              zIndex: 10,
+              padding: "16px",
+              backdropFilter: "blur(10px)", // Glass-like effect
+              backgroundColor: "rgba(255, 255, 255, 0.3)",
+              borderRadius: "8px",
             }}
           >
-            <CardContent sx={{ flex: 1 }}>
-              <Typography variant="h5">{event.name}</Typography>
-              <Typography variant="body2">
-                Date: {new Date(event.date).toLocaleDateString()}
-              </Typography>
-              <Typography variant="body2">
-                Location: {event.location}
-              </Typography>
-              <Button
-                component={Link}
-                to={`/event/${event._id}`}
-                variant="contained"
-              >
-                View Details
-              </Button>
-            </CardContent>
-            {event.image && ( // Conditional rendering for the images
-              <Box
-                sx={{
-                  display: { xs: "none", md: "flex" }, // show on medium screens and up
-                  p: 2, // padding around the images
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <img
-                  src={event.image[0]} // Assuming event.image is an array or object
-                  alt="Event"
-                  style={{
-                    width: "100px",
-                    height: "100px",
-                    objectFit: "cover",
-                    borderRadius: "5px",
-                    marginRight: "10px", // add margin between images
-                  }}
-                />
-                {event.image[1] && ( // Check if the second image exists
-                  <img
-                    src={event.image[1]}
-                    alt="Event"
-                    style={{
-                      width: "100px",
-                      height: "100px",
-                      objectFit: "cover",
-                      borderRadius: "5px",
-                    }}
-                  />
-                )}
-              </Box>
-            )}
-          </Card>
+            <DateCalendar value={selectedDate} onChange={handleDateChange} />
+          </Box>
+        </Collapse>
+
+        {/* Filter Inputs */}
+        <Collapse in={filterOpen}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+              marginBottom: 2,
+              "@media (min-width: 600px)": {
+                flexDirection: "row", // Horizontally align inputs on larger screens
+              },
+            }}
+          >
+            {/* Search Filter */}
+            <TextField
+              label="Search by Event Name"
+              variant="outlined"
+              value={searchText}
+              onChange={handleSearchChange}
+              sx={{
+                width: "100%", // Full width on small screens
+                "@media (min-width: 600px)": {
+                  width: "20%", // Adjust to 50% on larger screens
+                },
+              }}
+            />
+
+            {/* Sort Dropdown */}
+            <FormControl
+              variant="outlined"
+              sx={{
+                width: "100%", // Full width on small screens
+                "@media (min-width: 600px)": {
+                  width: "15%", // Adjust to 30% on larger screens
+                },
+              }}
+            >
+              <InputLabel>Sort by</InputLabel>
+              <Select value={sortCriteria} onChange={handleSortChange}>
+                <MenuItem value="date">Date</MenuItem>
+                <MenuItem value="price">Price</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+        </Collapse>
+
+        {/* Event Cards Section */}
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            gap: 2,
+            width: "100%",
+          }}
+        >
+          {filteredEvents.length > 0 ? (
+            filteredEvents.map((event) => (
+              <EventCard key={event._id} event={event} />
+            ))
+          ) : (
+            <Box>No events found</Box>
+          )}
         </Box>
-      ))}
-    </Container>
+      </Container>
+    </LocalizationProvider>
   );
 };
 

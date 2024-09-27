@@ -5,7 +5,8 @@ import EventDetails from "./pages/EventDetails.jsx";
 import BookingPage from "./pages/BookingPage.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
 import Navbar from "./components/Navbar.jsx";
-
+import BookedEvents from "./pages/BookedEvents.jsx";
+import EventCreation from "./components/EventCreation.jsx";
 function App() {
   return (
     <Router>
@@ -14,7 +15,9 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/event/:id" element={<EventDetails />} />
         <Route path="/booking/:id" element={<BookingPage />} />
+        <Route path="/bookings" element={<BookedEvents />} />
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/create_event" element={<EventCreation />} />
       </Routes>
     </Router>
   );

@@ -5,14 +5,56 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
-import Button from "@mui/material/Button";
 import Avatar from "@mui/material/Avatar";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import Divider from "@mui/material/Divider";
 import { Link } from "react-router-dom";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@mui/material/styles";
 
 export default function MenuAppBar() {
+  const [sidebarVisible, setSidebarVisible] = React.useState(false);
+  const [avatarMenuEl, setAvatarMenuEl] = React.useState(null);
+
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest(".menu")) {
+        setSidebarVisible(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
+
+  // Handle avatar menu click
+  const handleAvatarClick = (event) => {
+    setAvatarMenuEl(event.currentTarget);
+  };
+
+  const handleAvatarMenuClose = () => {
+    setAvatarMenuEl(null);
+  };
+
+  // Toggle sidebar visibility
+  const toggleSidebar = (event) => {
+    event.stopPropagation(); // Prevent the global click listener from immediately closing the sidebar
+    setSidebarVisible(!sidebarVisible);
+  };
+
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" sx={{ bgcolor: "#FCCD2A" }}>
+    <Box sx={{ flexGrow: 1, marginTop: "80px" }}>
+      <AppBar position="fixed" sx={{ bgcolor: "#276C78", top: 0 }}>
         <Toolbar
           sx={{
             display: "flex",
@@ -22,6 +64,7 @@ export default function MenuAppBar() {
             width: "100%",
           }}
         >
+          {/* Menu and Logo */}
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <IconButton
               size="large"
@@ -29,6 +72,8 @@ export default function MenuAppBar() {
               color="inherit"
               aria-label="menu"
               sx={{ mr: 2 }}
+              onClick={toggleSidebar}
+              className="menu"
             >
               <MenuIcon />
             </IconButton>
@@ -39,20 +84,99 @@ export default function MenuAppBar() {
               color="inherit"
               sx={{ textDecoration: "none" }}
             >
-              Platform
+              Cyprus Events
             </Typography>
           </Box>
-          <Box display="flex" flexDirection="row" gap={3}>
-            <Button component={Link} to="/events" color="inherit">
-              Events
-            </Button>
-            <Button component={Link} to="/booking" color="inherit">
-              Booking
-            </Button>
+
+          {/* Avatar and links */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              flexGrow: 1,
+              justifyContent: "flex-end",
+            }}
+          >
+            {!isSmallScreen && (
+              <>
+                <Link
+                  to="/bookings"
+                  style={{
+                    textDecoration: "none",
+                    color: "inherit",
+                    cursor: "pointer",
+                  }}
+                >
+                  <Typography variant="body1">Bookings</Typography>
+                </Link>
+
+                <Link
+                  to="/create_event"
+                  style={{
+                    textDecoration: "none",
+                    color: "inherit",
+                    cursor: "pointer",
+                  }}
+                >
+                  <Typography variant="body1">Create a post</Typography>
+                </Link>
+              </>
+            )}
+
+            <Avatar
+              sx={{
+                bgcolor: "#9DA8AD",
+                width: 36,
+                height: 36,
+                cursor: "pointer",
+              }}
+              onClick={handleAvatarClick}
+            />
+            <Menu
+              anchorEl={avatarMenuEl}
+              open={Boolean(avatarMenuEl)}
+              onClose={handleAvatarMenuClose}
+            >
+              <MenuItem onClick={handleAvatarMenuClose}>Profile</MenuItem>
+              <MenuItem onClick={handleAvatarMenuClose}>Settings</MenuItem>
+              <MenuItem onClick={handleAvatarMenuClose}>Logout</MenuItem>
+            </Menu>
           </Box>
-          <Avatar sx={{ bgcolor: "blue", width: 36, height: 36 }}>U</Avatar>
         </Toolbar>
       </AppBar>
+
+      {/* Sidebar */}
+      {sidebarVisible && (
+        <Box
+          sx={{
+            bgcolor: "#F5F5F5",
+            padding: "20px",
+            width: isSmallScreen ? "50%" : "9%",
+            position: "absolute",
+            top: "64px", // Adjust based on AppBar height (default 64px)
+            left: 0,
+            zIndex: 10,
+          }}
+          className="menu"
+        >
+          <List>
+            <ListItem button component={Link} to="/listings">
+              <ListItemText primary="Listings" />
+            </ListItem>
+            <ListItem button component={Link} to="/bookings">
+              <ListItemText primary="Bookings" />
+            </ListItem>
+            <ListItem button component={Link} to="/events">
+              <ListItemText primary="Events" />
+            </ListItem>
+            <Divider />
+            <ListItem button>
+              <ListItemText primary="More" />
+            </ListItem>
+          </List>
+        </Box>
+      )}
     </Box>
   );
 }

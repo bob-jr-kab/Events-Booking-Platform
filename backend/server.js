@@ -3,6 +3,7 @@ import { connectDB } from "./config/db.js";
 import cors from "cors";
 import dotenv from "dotenv";
 import eventRoutes from "./routes/eventRoutes.js";
+import bookingRoutes from "./routes/bookingRoutes.js";
 // Load environment variables
 dotenv.config();
 
@@ -15,6 +16,7 @@ app.use(express.json()); // to parse JSON bodies
 
 // Routes (will be added later)
 app.use("/api/events", eventRoutes);
+app.use("/api/bookings", bookingRoutes);
 // Start server
 app.listen(port, () => {
   connectDB();

@@ -23,10 +23,6 @@ const eventSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  images: {
-    type: [mongoose.Schema.Types.ObjectId], // Store image IDs from GridFS
-    default: [],
-  },
 });
 
 const Event = mongoose.model("Event", eventSchema);

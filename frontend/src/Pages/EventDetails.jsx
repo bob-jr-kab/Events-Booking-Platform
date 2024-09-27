@@ -57,11 +57,18 @@ const EventDetails = () => {
           <Typography variant="body2">
             Description: {event.description || "No description available."}
           </Typography>
+          <Typography variant="body2">
+            Tickets Available: {event.ticketsAvailable}
+          </Typography>
+          <Typography variant="body2">
+            Price: ${event.price.toFixed(2)}
+            {/* Display price with two decimal places */}
+          </Typography>
           <Button
             component={Link}
             to={`/booking/${event._id}`}
             variant="contained"
-            sx={{ mt: 2 }}
+            sx={{ mt: 2, bgcolor: "#276C78" }}
           >
             Book Now
           </Button>

@@ -1,176 +1,145 @@
-import { useState } from "react";
-import { TextField, Button, Typography, Box, Container } from "@mui/material";
+import { useState, useEffect } from "react";
+import {
+  Box,
+  Container,
+  Typography,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+} from "@mui/material";
+import { Edit, Delete } from "@mui/icons-material";
 import axios from "axios";
+import EventCard from "../components/EventCard"; // EventCard Component
+import EventForm from "../components/EventForm"; // EventForm Component
 
 const AdminDashboard = () => {
-  const [eventDetails, setEventDetails] = useState({
-    name: "",
-    date: "",
-    location: "",
-    description: "",
-    imageLink: "",
-    images: [],
-    ticketsAvailable: 0,
-    price: 0,
-  });
+  const [events, setEvents] = useState([]);
+  const [editingEvent, setEditingEvent] = useState(null); // Track the event being edited
+  const [dialogOpen, setDialogOpen] = useState(false); // Manage dialog open state
 
-  const handleChange = (e) => {
-    setEventDetails({ ...eventDetails, [e.target.name]: e.target.value });
-  };
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/api/events")
+      .then((response) => setEvents(response.data))
+      .catch((error) => console.error(error));
+  }, []);
 
-  const handleFileChange = (e) => {
-    setEventDetails({ ...eventDetails, images: [...e.target.files] });
-  };
-
-  const handleAddEvent = async () => {
-    // Basic validation
-    if (
-      !eventDetails.name ||
-      !eventDetails.date ||
-      !eventDetails.location ||
-      !eventDetails.ticketsAvailable ||
-      !eventDetails.price ||
-      eventDetails.images.length === 0 // Ensure images are selected
-    ) {
-      alert("Please fill in all required fields.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("name", eventDetails.name);
-    formData.append("date", eventDetails.date);
-    formData.append("location", eventDetails.location);
-    formData.append("description", eventDetails.description);
-    formData.append("ticketsAvailable", eventDetails.ticketsAvailable);
-    formData.append("price", eventDetails.price);
-
-    // Append each image file to FormData
-    for (let i = 0; i < eventDetails.images.length; i++) {
-      formData.append("images", eventDetails.images[i]);
-    }
-
+  const handleDelete = async (id) => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/events",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+      const response = await axios.delete(
+        `http://localhost:5000/api/events/${id}`
       );
-      console.log("Event created successfully:", response.data);
-      alert("Event added successfully!");
+      if (response.status === 200) {
+        setEvents(events.filter((event) => event._id !== id));
+        alert("Event deleted successfully");
+      } else {
+        alert("Failed to delete event");
+      }
     } catch (error) {
       console.error(
-        "Error adding event:",
+        "Failed to delete event",
         error.response?.data || error.message
       );
-      alert("Failed to add event");
+      alert("Failed to delete event");
     }
   };
+
+  const handleEdit = (event) => {
+    setEditingEvent(event); // Set the event to be edited
+    setDialogOpen(true); // Open the dialog
+  };
+
+  const handleEventUpdate = async (updatedEvent) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:5000/api/events/${editingEvent._id}`,
+        updatedEvent
+      );
+      // Update the events list with the modified event
+      setEvents(
+        events.map((event) =>
+          event._id === editingEvent._id ? response.data : event
+        )
+      );
+      setDialogOpen(false); // Close the dialog after editing
+      alert("Event updated successfully!");
+    } catch (error) {
+      console.error(
+        "Failed to update event",
+        error.response?.data || error.message
+      );
+      alert("Failed to update event");
+    }
+  };
+
   return (
-    <Container
-      maxWidth="sm"
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        flexDirection: "column",
-        minHeight: "100vh",
-      }}
-    >
-      <Typography variant="h5" gutterBottom>
-        Admin Dashboard - Create Event
+    <Container maxWidth="lg">
+      <Typography variant="h4" gutterBottom>
+        Admin Dashboard - Event Listings
       </Typography>
-      <Box
-        component="form"
-        sx={{
-          width: "100%", // Full width in small screens, adjust as needed
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-        }}
-        noValidate
-        autoComplete="off"
+
+      <Dialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        fullWidth
+        maxWidth="sm"
       >
-        <TextField
-          name="name"
-          label="Event Name"
-          value={eventDetails.name}
-          onChange={handleChange}
-          fullWidth
-        />
-        <TextField
-          name="date"
-          label="Event Date"
-          type="date"
-          value={eventDetails.date}
-          onChange={handleChange}
-          fullWidth
-          InputLabelProps={{ shrink: true }}
-        />
-        <TextField
-          name="location"
-          label="Location"
-          value={eventDetails.location}
-          onChange={handleChange}
-          fullWidth
-        />
-        <TextField
-          name="description"
-          label="Event Description"
-          value={eventDetails.description}
-          onChange={handleChange}
-          fullWidth
-          multiline
-          rows={4}
-        />
-        <TextField
-          name="imageLink"
-          label="Image URL (Optional)"
-          value={eventDetails.imageLink}
-          onChange={handleChange}
-          fullWidth
-        />
-        <TextField
-          name="ticketsAvailable"
-          label="Tickets Available"
-          type="number"
-          value={eventDetails.ticketsAvailable}
-          onChange={handleChange}
-          fullWidth
-        />
-        <TextField
-          name="price"
-          label="Price"
-          type="number"
-          value={eventDetails.price}
-          onChange={handleChange}
-          fullWidth
-        />
-        <input
-          accept="image/*"
-          style={{ display: "none" }}
-          id="image-upload"
-          type="file"
-          multiple
-          onChange={handleFileChange}
-        />
-        <label htmlFor="image-upload">
-          <Button variant="contained" component="span">
-            Upload Images
-          </Button>
-          {eventDetails.images.length > 0 && (
-            <Typography variant="body2" gutterBottom>
-              {eventDetails.images.length} image(s) selected
-            </Typography>
+        <DialogTitle>Edit Event</DialogTitle>
+        <DialogContent>
+          {editingEvent && (
+            <EventForm
+              initialEventDetails={editingEvent}
+              onSubmit={handleEventUpdate}
+            />
           )}
-        </label>
-        <Button variant="contained" color="primary" onClick={handleAddEvent}>
-          Add Event
-        </Button>
-      </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDialogOpen(false)} color="error">
+            Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {events.length === 0 ? (
+        <Typography>No events available</Typography>
+      ) : (
+        events.map((event) => (
+          <Box
+            key={event._id}
+            sx={{
+              position: "relative",
+              marginBottom: "20px",
+              border: "1px solid #ccc",
+              borderRadius: "8px",
+              overflow: "hidden",
+            }}
+          >
+            <EventCard event={event} />
+            <Box
+              sx={{
+                position: "absolute",
+                top: "10px",
+                right: "10px",
+                display: "flex",
+                gap: 1,
+              }}
+            >
+              <IconButton color="primary" onClick={() => handleEdit(event)}>
+                <Edit />
+              </IconButton>
+              <IconButton
+                color="secondary"
+                onClick={() => handleDelete(event._id)}
+              >
+                <Delete />
+              </IconButton>
+            </Box>
+          </Box>
+        ))
+      )}
     </Container>
   );
 };
