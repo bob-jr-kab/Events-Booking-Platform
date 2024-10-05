@@ -11,6 +11,9 @@ import {
 } from "@mui/material";
 import { Link } from "react-router-dom"; // Import Link for navigation
 import axios from "axios";
+import EventIcon from "@mui/icons-material/Event"; // Date icon
+import LocationOnIcon from "@mui/icons-material/LocationOn"; // Location icon
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney"; // Price icon
 
 const BookedEvents = () => {
   const [bookings, setBookings] = useState([]);
@@ -111,14 +114,26 @@ const BookedEvents = () => {
             </Typography>
             {event ? (
               <>
-                <Typography variant="body2">
+                <Typography
+                  variant="body2"
+                  sx={{ display: "flex", alignItems: "center" }}
+                >
+                  <AttachMoneyIcon sx={{ mr: 1 }} />
                   Total Price: $
                   {(booking.numberOfTickets * event.price).toFixed(2)}
                 </Typography>
-                <Typography variant="body2">
+                <Typography
+                  variant="body2"
+                  sx={{ display: "flex", alignItems: "center" }}
+                >
+                  <EventIcon sx={{ mr: 1 }} />
                   Event Name: {event.name}
                 </Typography>
-                <Typography variant="body2">
+                <Typography
+                  variant="body2"
+                  sx={{ display: "flex", alignItems: "center" }}
+                >
+                  <LocationOnIcon sx={{ mr: 1 }} />
                   Location: {event.location}
                 </Typography>
                 <Button

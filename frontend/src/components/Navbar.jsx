@@ -54,13 +54,18 @@ export default function MenuAppBar() {
 
   return (
     <Box sx={{ flexGrow: 1, marginTop: "80px" }}>
-      <AppBar position="fixed" sx={{ bgcolor: "#276C78", top: 0 }}>
+      <AppBar
+        position="fixed"
+        sx={{ bgcolor: "#276C78", top: 0, padding: "0px 80px" }}
+      >
         <Toolbar
           sx={{
             display: "flex",
             justifyContent: "space-between",
-            maxWidth: "1366px",
+            maxWidth: "100%", // Adjust to full width
             margin: "0 auto",
+            paddingLeft: "16px", // Add padding to prevent overflow on small screens
+            paddingRight: "16px",
             width: "100%",
           }}
         >
@@ -96,6 +101,7 @@ export default function MenuAppBar() {
               gap: 2,
               flexGrow: 1,
               justifyContent: "flex-end",
+              maxWidth: "100%", // Ensure everything is within the screen's width
             }}
           >
             {!isSmallScreen && (
@@ -139,7 +145,18 @@ export default function MenuAppBar() {
               onClose={handleAvatarMenuClose}
             >
               <MenuItem onClick={handleAvatarMenuClose}>Profile</MenuItem>
-              <MenuItem onClick={handleAvatarMenuClose}>Settings</MenuItem>
+              <MenuItem onClick={handleAvatarMenuClose}>
+                <Link
+                  to="/Admin"
+                  style={{
+                    textDecoration: "none",
+                    color: "inherit",
+                    cursor: "pointer",
+                  }}
+                >
+                  Admin
+                </Link>
+              </MenuItem>
               <MenuItem onClick={handleAvatarMenuClose}>Logout</MenuItem>
             </Menu>
           </Box>

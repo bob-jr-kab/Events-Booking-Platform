@@ -15,23 +15,36 @@ import axios from "axios";
 import EventCard from "../components/EventCard"; // EventCard Component
 import EventForm from "../components/EventForm"; // EventForm Component
 
+const BASE_URL = "http://localhost:5000"; // Ensure this matches your backend URL
+
 const AdminDashboard = () => {
   const [events, setEvents] = useState([]);
   const [editingEvent, setEditingEvent] = useState(null); // Track the event being edited
   const [dialogOpen, setDialogOpen] = useState(false); // Manage dialog open state
 
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/events")
-      .then((response) => setEvents(response.data))
-      .catch((error) => console.error(error));
+    const fetchEvents = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/api/events`);
+
+        // Build image URLs for events
+        const eventsWithImages = response.data.map((event) => ({
+          ...event,
+          images: event.images.map((image) => `${BASE_URL}${image}`),
+        }));
+
+        setEvents(eventsWithImages);
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      }
+    };
+
+    fetchEvents();
   }, []);
 
   const handleDelete = async (id) => {
     try {
-      const response = await axios.delete(
-        `http://localhost:5000/api/events/${id}`
-      );
+      const response = await axios.delete(`${BASE_URL}/api/events/${id}`);
       if (response.status === 200) {
         setEvents(events.filter((event) => event._id !== id));
         alert("Event deleted successfully");
@@ -52,12 +65,28 @@ const AdminDashboard = () => {
     setDialogOpen(true); // Open the dialog
   };
 
-  const handleEventUpdate = async (updatedEvent) => {
+  const handleEventUpdate = async (updatedEvent, selectedImages) => {
     try {
+      const formData = new FormData();
+
+      // Append updated event details to FormData
+      Object.entries(updatedEvent).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
+
+      // Append selected images to FormData
+      selectedImages.forEach((image) => {
+        formData.append("images", image);
+      });
+
       const response = await axios.put(
-        `http://localhost:5000/api/events/${editingEvent._id}`,
-        updatedEvent
+        `${BASE_URL}/api/events/${editingEvent._id}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
       );
+
       // Update the events list with the modified event
       setEvents(
         events.map((event) =>
@@ -91,8 +120,8 @@ const AdminDashboard = () => {
         <DialogContent>
           {editingEvent && (
             <EventForm
-              initialEventDetails={editingEvent}
-              onSubmit={handleEventUpdate}
+              initialEventDetails={editingEvent} // Populate form with current event data
+              onSubmit={handleEventUpdate} // Pass the update handler to the form
             />
           )}
         </DialogContent>
@@ -111,12 +140,11 @@ const AdminDashboard = () => {
             key={event._id}
             sx={{
               position: "relative",
-              marginBottom: "20px",
-              border: "1px solid #ccc",
               borderRadius: "8px",
               overflow: "hidden",
             }}
           >
+            {/* Pass the event data to EventCard, which includes images */}
             <EventCard event={event} />
             <Box
               sx={{

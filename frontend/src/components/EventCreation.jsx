@@ -6,7 +6,11 @@ import {
   Typography,
   Snackbar,
   Alert,
+  Switch,
+  FormControlLabel,
+  IconButton,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 
 const EventCreation = () => {
@@ -22,20 +26,54 @@ const EventCreation = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("error");
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [isFree, setIsFree] = useState(false); // State for free toggle
 
   const handleChange = (e) => {
     setEventDetails({ ...eventDetails, [e.target.name]: e.target.value });
   };
 
+  const handleToggleChange = (e) => {
+    const checked = e.target.checked;
+    setIsFree(checked);
+    setEventDetails((prevDetails) => ({
+      ...prevDetails,
+      price: checked ? "Free" : 0, // Set price as "Free" when toggle is checked
+    }));
+  };
+
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    setSelectedImages(files); // Store selected images in the state
+  };
+
+  const clearImageSelection = () => {
+    setSelectedImages([]); // Clear selected images
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const formData = new FormData();
+
+    // Append event details
+    Object.entries(eventDetails).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+
+    // Append selected images
+    selectedImages.forEach((image) => {
+      formData.append("images", image); // Append each selected image to the formData
+    });
+
     try {
       const response = await axios.post(
         "http://localhost:5000/api/events",
-        eventDetails
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
       );
       console.log("Event created successfully:", response.data);
-      // Optionally, reset the form or show a success message
+
+      // Reset form after successful event creation
       setEventDetails({
         name: "",
         date: "",
@@ -44,7 +82,10 @@ const EventCreation = () => {
         ticketsAvailable: 0,
         price: 0,
       });
-      // Optionally, you can show a success message here too
+      setSelectedImages([]); // Clear images
+      setSnackbarMessage("Event created successfully!");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
     } catch (error) {
       console.error(
         "Error creating event:",
@@ -120,11 +161,51 @@ const EventCreation = () => {
       <TextField
         name="price"
         label="Price"
-        type="number"
-        value={eventDetails.price}
+        type="text" // Changed to text to allow for "Free"
+        value={isFree ? "Free" : eventDetails.price} // Show "Free" when toggled
         onChange={handleChange}
         fullWidth
+        disabled={isFree} // Disable price field when free is toggled
       />
+      <FormControlLabel
+        control={
+          <Switch
+            checked={isFree}
+            onChange={handleToggleChange}
+            name="free"
+            color="primary"
+          />
+        }
+        label="Free Event"
+      />
+
+      {/* Image upload */}
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        <Button
+          variant="contained"
+          component="label"
+          sx={{ bgcolor: "#276C78", width: "150px" }}
+        >
+          Upload Images
+          <input
+            type="file"
+            hidden
+            multiple
+            accept="image/*"
+            onChange={handleImageChange}
+          />
+        </Button>
+        {/* Display selected image count with cancel (X) button */}
+        {selectedImages.length > 0 && (
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Typography>{selectedImages.length} images selected</Typography>
+            <IconButton size="small" onClick={clearImageSelection}>
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </Box>
+        )}
+      </Box>
+
       <Button variant="contained" sx={{ bgcolor: "#276C78" }} type="submit">
         Create Event
       </Button>

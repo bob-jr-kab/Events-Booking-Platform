@@ -27,17 +27,29 @@ const HomePage = () => {
   const [searchText, setSearchText] = useState(""); // For filtering by name
   const [sortCriteria, setSortCriteria] = useState(""); // For sorting
   const [selectedDate, setSelectedDate] = useState(null); // For selected date
-
   const calendarRef = useRef(null); // To track clicks outside calendar
 
+  const BASE_URL = "http://localhost:5000"; // Ensure this matches your backend URL
+
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/events")
-      .then((response) => {
-        setEvents(response.data);
-        setFilteredEvents(response.data); // Initially display all events
-      })
-      .catch((error) => console.log(error));
+    const fetchEvents = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/api/events`);
+
+        // Build image URLs for events
+        const eventsWithImages = response.data.map((event) => ({
+          ...event,
+          images: event.images.map((image) => `${BASE_URL}${image}`),
+        }));
+
+        setEvents(eventsWithImages);
+        setFilteredEvents(eventsWithImages); // Initially display all events
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      }
+    };
+
+    fetchEvents();
   }, []);
 
   useEffect(() => {
@@ -91,6 +103,23 @@ const HomePage = () => {
     setFilteredEvents(filtered);
   };
 
+  // Clear filters and reset all states
+  const clearFilters = () => {
+    setSearchText("");
+    setSortCriteria("");
+    setSelectedDate(null);
+    setFilteredEvents(events); // Reset to show all events
+  };
+
+  // Toggle Calendar Function
+  const toggleCalendar = () => {
+    setCalendarOpen((prevOpen) => {
+      const newOpen = !prevOpen;
+      if (newOpen) setFilterOpen(false); // Close filter if calendar is open
+      return newOpen;
+    });
+  };
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Container
@@ -101,7 +130,7 @@ const HomePage = () => {
           minHeight: "100vh",
           maxWidth: "1366px",
           margin: "0 auto",
-          padding: "20px",
+          padding: "10px",
         }}
       >
         {/* Filter and Sort Section */}
@@ -119,7 +148,7 @@ const HomePage = () => {
           <Button
             onClick={() => {
               setFilterOpen(!filterOpen);
-              setCalendarOpen(false); // Ensure calendar is closed
+              setCalendarOpen(false); // Ensure calendar is closed when filter opens
             }}
             endIcon={<ExpandMoreIcon />}
           >
@@ -127,13 +156,12 @@ const HomePage = () => {
           </Button>
 
           {/* Calendar Icon */}
-          <Button
-            onClick={() => {
-              setCalendarOpen(!calendarOpen);
-              setFilterOpen(false); // Ensure filter is closed
-            }}
-            endIcon={<CalendarMonthIcon />}
-          ></Button>
+          <Button onClick={toggleCalendar} endIcon={<CalendarMonthIcon />} />
+
+          {/* Clear Filters Button */}
+          <Button onClick={clearFilters} variant="contained" color="secondary">
+            Clear Filters
+          </Button>
         </Box>
 
         {/* Calendar Popup */}
@@ -216,7 +244,7 @@ const HomePage = () => {
               <EventCard key={event._id} event={event} />
             ))
           ) : (
-            <Box>No events found</Box>
+            <Box>No events found!</Box>
           )}
         </Box>
       </Container>
