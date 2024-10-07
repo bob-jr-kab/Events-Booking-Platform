@@ -17,7 +17,7 @@ const BookingPage = () => {
     try {
       // Send booking details to the server
       const response = await axios.post(
-        "http://localhost:5000/api/bookings",
+        "${window.location.origin}/api/bookings",
         bookingDetails
       );
       alert("Booking confirmed! " + response.data.message);

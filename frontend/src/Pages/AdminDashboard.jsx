@@ -15,7 +15,7 @@ import axios from "axios";
 import EventCard from "../components/EventCard"; // EventCard Component
 import EventForm from "../components/EventForm"; // EventForm Component
 
-const BASE_URL = "http://localhost:5000"; // Ensure this matches your backend URL
+const BASE_URL = "${window.location.origin}"; // Ensure this matches your backend URL
 
 const AdminDashboard = () => {
   const [events, setEvents] = useState([]);

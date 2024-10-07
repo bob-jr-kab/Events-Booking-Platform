@@ -28,7 +28,7 @@ const BookedEvents = () => {
     const fetchBookingsAndEvents = async () => {
       try {
         const bookingsResponse = await axios.get(
-          "http://localhost:5000/api/bookings"
+          "${window.location.origin}/api/bookings"
         );
         setBookings(bookingsResponse.data);
 
@@ -38,7 +38,7 @@ const BookedEvents = () => {
         );
         const uniqueEventIds = [...new Set(eventIds)]; // Get unique event IDs
         const eventsResponse = await axios.get(
-          `http://localhost:5000/api/events?ids=${uniqueEventIds.join(",")}`
+          `${window.location.origin}/api/events?ids=${uniqueEventIds.join(",")}`
         );
         const eventsData = eventsResponse.data.reduce((acc, event) => {
           acc[event._id] = event; // Map events by their ID
@@ -65,7 +65,7 @@ const BookedEvents = () => {
 
     try {
       await axios.delete(
-        `http://localhost:5000/api/bookings/${bookingToCancel._id}` // Ensure correct booking ID is used
+        `${window.location.origin}/api/bookings/${bookingToCancel._id}` // Ensure correct booking ID is used
       );
       // After successful deletion, remove the booking from state
       setBookings(bookings.filter((b) => b._id !== bookingToCancel._id));

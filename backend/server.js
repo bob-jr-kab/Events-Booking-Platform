@@ -2,8 +2,8 @@ import express from "express";
 import { connectDB } from "./config/db.js";
 import cors from "cors";
 import dotenv from "dotenv";
-import eventRoutes from "./routes/eventRoutes.js";
-import bookingRoutes from "./routes/bookingRoutes.js";
+import eventRoutes from "./api/eventRoutes.js";
+import bookingRoutes from "./api/bookingRoutes.js";
 import path from "path"; // Uncomment this line if you need path for serving frontend
 
 dotenv.config(); // Load environment variables from .env file
