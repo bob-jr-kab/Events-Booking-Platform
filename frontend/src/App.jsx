@@ -7,6 +7,7 @@ import AdminDashboard from "./pages/AdminDashboard.jsx";
 import Navbar from "./components/Navbar.jsx";
 import BookedEvents from "./pages/BookedEvents.jsx";
 import EventCreation from "./components/EventCreation.jsx";
+import EventDetails from "./pages/EventDetails.jsx";
 function App() {
   return (
     <Router>
