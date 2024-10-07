@@ -13,11 +13,14 @@ const EventCard = ({ event }) => {
   const dateNumber = eventDate.getDate();
   const fullDate = eventDate.toLocaleDateString();
 
+  const iconColor = "#507687"; // Set green color for icons
+  const typoColor = "#025464";
   return (
     <Box
       sx={{
         width: "100%",
         maxWidth: "1366px",
+        padding: "0px",
         marginBottom: "20px",
       }}
     >
@@ -30,16 +33,16 @@ const EventCard = ({ event }) => {
       >
         <Box
           sx={{
-            width: { xs: "100%", md: "150px" },
+            width: { xs: "100%", md: "200px" },
+            height: { xs: "300px", md: "200px" },
+
             display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "#AFD3E2",
-            textAlign: "center",
-            padding: "5px",
-            margin: "5px",
+            flexDirection: "column", // Stack day and date vertically
+            alignItems: "center", // Center items horizontally
+            justifyContent: "center", // Center items vertically
+            backgroundColor: "#DEE5D4",
             borderRadius: "4px",
-            flexDirection: "column",
+            textAlign: "center", // Center text
           }}
         >
           {event.images && event.images.length > 0 ? (
@@ -48,47 +51,64 @@ const EventCard = ({ event }) => {
               alt={event.name}
               style={{
                 width: "100%",
-                height: "auto",
-                objectFit: "cover",
-                borderRadius: "4px 0 0 4px",
+                height: "100%", // Fill the entire height of the box
+                objectFit: "cover", // Ensure the image covers the entire box
+                borderRadius: "4px 0 0 4px", // Set border radius directly on the image
               }}
             />
           ) : (
             <>
-              <div style={{ fontSize: "1.5rem" }}>{day}</div>
-              <div style={{ fontSize: "3rem", fontWeight: "bold" }}>
+              <Typography variant="h6" sx={{ color: "#7AB2B2" }}>
+                {day}
+              </Typography>
+              <Typography
+                variant="h4"
+                sx={{ fontWeight: "bold", color: "#7AB2B2" }}
+              >
                 {dateNumber}
-              </div>
+              </Typography>
             </>
           )}
         </Box>
 
         <CardContent sx={{ flex: 1 }}>
-          <Typography variant="h5">{event.name}</Typography>
+          <Typography
+            variant="h5"
+            sx={{ textTransform: "capitalize", color: "#507687" }}
+          >
+            {event.name}
+          </Typography>
 
           {/* Date with Icon */}
           <Box sx={{ display: "flex", alignItems: "center", marginTop: "5px" }}>
-            <EventIcon sx={{ marginRight: "5px" }} />
-            <Typography variant="body2">{fullDate}</Typography>
+            <EventIcon sx={{ marginRight: "5px", color: iconColor }} />
+            <Typography sx={{ color: typoColor }}>{fullDate}</Typography>
           </Box>
 
           {/* Location with Icon */}
           <Box sx={{ display: "flex", alignItems: "center", marginTop: "5px" }}>
-            <LocationOnIcon sx={{ marginRight: "5px" }} />
-            <Typography variant="body2">{event.location}</Typography>
+            <LocationOnIcon sx={{ marginRight: "5px", color: iconColor }} />
+            <Typography sx={{ color: typoColor }}>{event.location}</Typography>
           </Box>
 
           {/* Price with Icon */}
           <Box sx={{ display: "flex", alignItems: "center", marginTop: "5px" }}>
             {event.price === "Free" ? (
               <>
-                <MoneyOffIcon sx={{ marginRight: "5px" }} />
-                <Typography variant="body2">Free</Typography>
+                <MoneyOffIcon sx={{ marginRight: "5px", color: iconColor }} />
+                <Typography sx={{ color: typoColor }} variant="body2">
+                  Free
+                </Typography>
               </>
             ) : (
               <>
-                <AttachMoneyIcon sx={{ marginRight: "5px" }} />
-                <Typography variant="body2">{`${event.price} TL`}</Typography>
+                <AttachMoneyIcon
+                  sx={{ marginRight: "5px", color: iconColor }}
+                />
+                <Typography
+                  sx={{ color: typoColor }}
+                  variant="body2"
+                >{`${event.price} TL`}</Typography>
               </>
             )}
           </Box>
@@ -96,7 +116,10 @@ const EventCard = ({ event }) => {
           <Box
             sx={{ display: "flex", alignItems: "center", marginTop: "10px" }}
           >
-            <Typography variant="body1" sx={{ marginRight: 1 }}>
+            <Typography
+              variant="body1"
+              sx={{ marginRight: 1, color: typoColor }}
+            >
               View Details
             </Typography>
             <IconButton

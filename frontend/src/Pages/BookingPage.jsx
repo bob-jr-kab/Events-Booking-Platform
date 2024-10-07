@@ -41,7 +41,7 @@ const BookingPage = () => {
         borderRadius: 2,
       }}
     >
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h6" gutterBottom sx={{ color: "#507687" }}>
         Booking Event
       </Typography>
       <TextField
@@ -66,7 +66,11 @@ const BookingPage = () => {
         fullWidth
         margin="normal"
       />
-      <Button variant="contained" color="primary" onClick={handleBooking}>
+      <Button
+        variant="contained"
+        sx={{ bgcolor: "#276C78" }}
+        onClick={handleBooking}
+      >
         Confirm Booking
       </Button>
     </Box>

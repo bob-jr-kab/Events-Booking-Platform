@@ -24,6 +24,9 @@ const EventDetails = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate(); // Initialize useNavigate for navigation
 
+  const iconColor = "#507687"; // Same color as EventCard component
+  const typoColor = "#025464";
+
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
@@ -66,43 +69,62 @@ const EventDetails = () => {
     <Container maxWidth="md" sx={{ mt: 4 }}>
       <Card>
         <CardContent>
-          <Typography variant="h4">{event.name}</Typography>
+          <Typography
+            variant="h4"
+            sx={{ textTransform: "capitalize", color: "#507687" }}
+          >
+            {event.name}
+          </Typography>
 
           {/* Date with Icon */}
           <Box sx={{ display: "flex", alignItems: "center", marginTop: "5px" }}>
-            <EventIcon sx={{ marginRight: "5px" }} />
-            <Typography variant="body2">
+            <EventIcon sx={{ marginRight: "5px", color: iconColor }} />
+            <Typography sx={{ color: typoColor }} variant="body2">
               {new Date(event.date).toLocaleDateString()}
             </Typography>
           </Box>
 
           {/* Location with Icon */}
           <Box sx={{ display: "flex", alignItems: "center", marginTop: "5px" }}>
-            <LocationOnIcon sx={{ marginRight: "5px" }} />
-            <Typography variant="body2">{event.location}</Typography>
+            <LocationOnIcon sx={{ marginRight: "5px", color: iconColor }} />
+            <Typography sx={{ color: typoColor }} variant="body2">
+              {event.location}
+            </Typography>
           </Box>
 
           {/* Price with Icon */}
           <Box sx={{ display: "flex", alignItems: "center", marginTop: "5px" }}>
             {event.price === "Free" ? (
               <>
-                <MoneyOffIcon sx={{ marginRight: "5px" }} />
-                <Typography variant="body2">Free</Typography>
+                <MoneyOffIcon sx={{ marginRight: "5px", color: iconColor }} />
+                <Typography sx={{ color: typoColor }} variant="body2">
+                  Free
+                </Typography>
               </>
             ) : (
               <>
-                <AttachMoneyIcon sx={{ marginRight: "5px" }} />
-                <Typography variant="body2">{`${event.price} TL`}</Typography>
+                <AttachMoneyIcon
+                  sx={{ marginRight: "5px", color: iconColor }}
+                />
+                <Typography sx={{ color: typoColor }} variant="body2">
+                  {`${event.price} TL`}
+                </Typography>
               </>
             )}
           </Box>
 
           {/* Description */}
-          <Typography variant="body2" sx={{ marginTop: "10px" }}>
+          <Typography
+            variant="body2"
+            sx={{ marginTop: "10px", color: typoColor }}
+          >
             Description: {event.description || "No description available."}
           </Typography>
 
-          <Typography variant="body2" sx={{ marginTop: "10px" }}>
+          <Typography
+            variant="body2"
+            sx={{ marginTop: "10px", color: typoColor }}
+          >
             Tickets Available: {event.ticketsAvailable}
           </Typography>
 
@@ -123,7 +145,7 @@ const EventDetails = () => {
                 />
               ))
             ) : (
-              <Typography>No images available for this event.</Typography>
+              <Typography>--</Typography>
             )}
           </Box>
 
@@ -131,7 +153,7 @@ const EventDetails = () => {
             component={Link}
             to={`/booking/${event._id}`}
             variant="contained"
-            sx={{ mt: 2, bgcolor: "#276C78" }}
+            sx={{ mt: 2, bgcolor: "#507687" }}
           >
             Book Now
           </Button>

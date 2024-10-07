@@ -36,14 +36,16 @@ const HomePage = () => {
       try {
         const response = await axios.get(`${BASE_URL}/api/events`);
 
-        // Build image URLs for events
-        const eventsWithImages = response.data.map((event) => ({
-          ...event,
-          images: event.images.map((image) => `${BASE_URL}${image}`),
-        }));
+        // Build image URLs for events and sort by latest date
+        const eventsWithImages = response.data
+          .map((event) => ({
+            ...event,
+            images: event.images.map((image) => `${BASE_URL}${image}`),
+          }))
+          .sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort by latest date
 
         setEvents(eventsWithImages);
-        setFilteredEvents(eventsWithImages); // Initially display all events
+        setFilteredEvents(eventsWithImages); // Initially display all events sorted
       } catch (error) {
         console.error("Error fetching events:", error);
       }
@@ -87,7 +89,7 @@ const HomePage = () => {
 
     let sortedEvents = [...filteredEvents]; // Create a copy of the filtered events
     if (criteria === "date") {
-      sortedEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
+      sortedEvents.sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort by latest to oldest
     } else if (criteria === "price") {
       sortedEvents.sort((a, b) => a.price - b.price);
     }
@@ -141,11 +143,12 @@ const HomePage = () => {
             display: "flex",
             alignItems: "center", // Align vertically center
             gap: 2, // Gap between elements
-            flexDirection: "row", // Align horizontally
+            flexDirection: "row",
           }}
         >
           {/* Filter Button */}
           <Button
+            sx={{ color: "#507687" }}
             onClick={() => {
               setFilterOpen(!filterOpen);
               setCalendarOpen(false); // Ensure calendar is closed when filter opens
@@ -156,10 +159,13 @@ const HomePage = () => {
           </Button>
 
           {/* Calendar Icon */}
-          <Button onClick={toggleCalendar} endIcon={<CalendarMonthIcon />} />
+          <Button
+            onClick={toggleCalendar}
+            endIcon={<CalendarMonthIcon sx={{ color: "#507687" }} />}
+          />
 
           {/* Clear Filters Button */}
-          <Button onClick={clearFilters} variant="contained" color="secondary">
+          <Button onClick={clearFilters} sx={{ color: "#507687" }}>
             Clear Filters
           </Button>
         </Box>
@@ -171,15 +177,18 @@ const HomePage = () => {
             sx={{
               position: "absolute",
               left: "0", // Appear to the left of the HomePage
-              top: "150px",
+              top: "120px",
               zIndex: 10,
               padding: "16px",
               backdropFilter: "blur(10px)", // Glass-like effect
-              backgroundColor: "rgba(255, 255, 255, 0.3)",
               borderRadius: "8px",
             }}
           >
-            <DateCalendar value={selectedDate} onChange={handleDateChange} />
+            <DateCalendar
+              value={selectedDate}
+              onChange={handleDateChange}
+              sx={{ width: "200px", height: "250px" }}
+            />
           </Box>
         </Collapse>
 

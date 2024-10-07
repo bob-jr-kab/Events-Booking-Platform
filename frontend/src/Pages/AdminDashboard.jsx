@@ -106,8 +106,12 @@ const AdminDashboard = () => {
 
   return (
     <Container maxWidth="lg">
-      <Typography variant="h4" gutterBottom>
-        Admin Dashboard - Event Listings
+      <Typography
+        variant="h5"
+        gutterBottom
+        sx={{ color: "#001F3F", textAlign: "center" }}
+      >
+        Event Listings
       </Typography>
 
       <Dialog
@@ -159,7 +163,7 @@ const AdminDashboard = () => {
                 <Edit />
               </IconButton>
               <IconButton
-                color="secondary"
+                color="#B8001F"
                 onClick={() => handleDelete(event._id)}
               >
                 <Delete />

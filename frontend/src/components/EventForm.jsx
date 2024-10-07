@@ -1,66 +1,24 @@
-import { useState } from "react";
-import {
-  TextField,
-  Button,
-  Box,
-  Typography,
-  Snackbar,
-  Alert,
-} from "@mui/material";
-import axios from "axios";
+import { useState, useEffect } from "react";
+import { TextField, Button, Box, Snackbar, Alert } from "@mui/material";
 
-const EventCreation = () => {
-  const [eventDetails, setEventDetails] = useState({
-    name: "",
-    date: "",
-    location: "",
-    description: "",
-    ticketsAvailable: 0,
-    price: 0,
-  });
-
+const EventForm = ({ initialEventDetails, onSubmit }) => {
+  const [eventDetails, setEventDetails] = useState(initialEventDetails);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("error");
+
+  // Update the form when initialEventDetails changes
+  useEffect(() => {
+    setEventDetails(initialEventDetails);
+  }, [initialEventDetails]);
 
   const handleChange = (e) => {
     setEventDetails({ ...eventDetails, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      const response = await axios.post(
-        "http://localhost:5000/api/events",
-        eventDetails
-      );
-      console.log("Event created successfully:", response.data);
-      // Reset the form after successful submission
-      setEventDetails({
-        name: "",
-        date: "",
-        location: "",
-        description: "",
-        ticketsAvailable: 0,
-        price: 0,
-      });
-      // Show success message
-      setSnackbarMessage("Event created successfully!");
-      setSnackbarSeverity("success");
-      setSnackbarOpen(true);
-    } catch (error) {
-      console.error(
-        "Error creating event:",
-        error.response?.data || error.message
-      );
-      // Show error message using Snackbar
-      setSnackbarMessage(
-        "Failed to create event: " +
-          (error.response?.data.message || "Unknown error")
-      );
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
-    }
+    onSubmit(eventDetails); // Call the passed in onSubmit function
   };
 
   const handleCloseSnackbar = () => {
@@ -72,21 +30,16 @@ const EventCreation = () => {
       component="form"
       sx={{
         width: "100%",
-        maxWidth: "600px", // Adjust the max width as needed
-        mx: "auto", // Center the form
         display: "flex",
         flexDirection: "column",
+        padding: "10px 0px",
         gap: 2,
-        mt: 4,
       }}
       onSubmit={handleSubmit}
     >
-      <Typography variant="h5" gutterBottom>
-        Create New Event
-      </Typography>
       <TextField
         name="name"
-        label="Event Name"
+        label="Event Title"
         value={eventDetails.name}
         onChange={handleChange}
         fullWidth
@@ -133,10 +86,9 @@ const EventCreation = () => {
         fullWidth
       />
       <Button variant="contained" sx={{ bgcolor: "#276C78" }} type="submit">
-        Create Event
+        Update Event
       </Button>
 
-      {/* Snackbar for error handling */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
@@ -155,4 +107,4 @@ const EventCreation = () => {
   );
 };
 
-export default EventCreation;
+export default EventForm;

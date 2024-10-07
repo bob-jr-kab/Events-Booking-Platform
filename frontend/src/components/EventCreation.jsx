@@ -11,6 +11,7 @@ import {
   IconButton,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload"; // Import CloudUpload icon
 import axios from "axios";
 
 const EventCreation = () => {
@@ -115,12 +116,16 @@ const EventCreation = () => {
       }}
       onSubmit={handleSubmit}
     >
-      <Typography variant="h5" gutterBottom>
+      <Typography
+        variant="h5"
+        gutterBottom
+        sx={{ color: "#507687", textAlign: "center" }}
+      >
         Create New Event
       </Typography>
       <TextField
         name="name"
-        label="Event Name"
+        label="Event Title"
         value={eventDetails.name}
         onChange={handleChange}
         fullWidth
@@ -158,33 +163,38 @@ const EventCreation = () => {
         onChange={handleChange}
         fullWidth
       />
-      <TextField
-        name="price"
-        label="Price"
-        type="text" // Changed to text to allow for "Free"
-        value={isFree ? "Free" : eventDetails.price} // Show "Free" when toggled
-        onChange={handleChange}
-        fullWidth
-        disabled={isFree} // Disable price field when free is toggled
-      />
-      <FormControlLabel
-        control={
-          <Switch
-            checked={isFree}
-            onChange={handleToggleChange}
-            name="free"
-            color="primary"
-          />
-        }
-        label="Free Event"
-      />
+
+      {/* Price and Free Event Toggle Side by Side */}
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        <TextField
+          name="price"
+          label="Price"
+          type="text" // Changed to text to allow for "Free"
+          value={isFree ? "Free" : eventDetails.price} // Show "Free" when toggled
+          onChange={handleChange}
+          disabled={isFree} // Disable price field when free is toggled
+          sx={{ flex: 1, maxWidth: "500px" }} // Reduce width of price input
+        />
+        <FormControlLabel
+          control={
+            <Switch
+              checked={isFree}
+              onChange={handleToggleChange}
+              name="free"
+              color="primary"
+            />
+          }
+          label="Free Event"
+        />
+      </Box>
 
       {/* Image upload */}
       <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
         <Button
           variant="contained"
           component="label"
-          sx={{ bgcolor: "#276C78", width: "150px" }}
+          sx={{ bgcolor: "#276C78", width: "200px" }} // Adjusted width of button
+          startIcon={<CloudUploadIcon />} // Added upload icon
         >
           Upload Images
           <input
@@ -207,7 +217,7 @@ const EventCreation = () => {
       </Box>
 
       <Button variant="contained" sx={{ bgcolor: "#276C78" }} type="submit">
-        Create Event
+        Post Event
       </Button>
 
       {/* Snackbar for error handling */}

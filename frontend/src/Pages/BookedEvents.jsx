@@ -21,6 +21,9 @@ const BookedEvents = () => {
   const [openDialog, setOpenDialog] = useState(false); // For dialog confirmation
   const [bookingToCancel, setBookingToCancel] = useState(null); // Track which booking to cancel
 
+  const iconColor = "#507687"; // Set icon color
+  const typoColor = "#025464"; // Set text color
+
   useEffect(() => {
     const fetchBookingsAndEvents = async () => {
       try {
@@ -88,7 +91,7 @@ const BookedEvents = () => {
         alignItems: "center",
       }}
     >
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h5" gutterBottom sx={{ color: "#507687" }}>
         Booked Events
       </Typography>
       {bookings.map((booking) => {
@@ -106,55 +109,77 @@ const BookedEvents = () => {
               boxShadow: 2, // Optional: add shadow for depth
             }}
           >
-            <Typography variant="h6">{booking.fullName}</Typography>
-            <Typography variant="body2">Event ID: {booking.eventId}</Typography>
-            <Typography variant="body2">Email: {booking.email}</Typography>
-            <Typography variant="body2">
+            <Typography
+              variant="h6"
+              sx={{ textTransform: "capitalize", color: typoColor }}
+            >
+              {booking.fullName}
+            </Typography>
+            <Typography variant="body2" sx={{ color: typoColor }}>
+              Event ID: {booking.eventId}
+            </Typography>
+            <Typography variant="body2" sx={{ color: typoColor }}>
+              Email: {booking.email}
+            </Typography>
+            <Typography variant="body2" sx={{ color: typoColor }}>
               Tickets: {booking.numberOfTickets}
             </Typography>
             {event ? (
               <>
                 <Typography
                   variant="body2"
-                  sx={{ display: "flex", alignItems: "center" }}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    color: typoColor,
+                  }}
                 >
-                  <AttachMoneyIcon sx={{ mr: 1 }} />
+                  <AttachMoneyIcon sx={{ mr: 1, color: iconColor }} />
                   Total Price: $
                   {(booking.numberOfTickets * event.price).toFixed(2)}
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{ display: "flex", alignItems: "center" }}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    color: typoColor,
+                  }}
                 >
-                  <EventIcon sx={{ mr: 1 }} />
+                  <EventIcon sx={{ mr: 1, color: iconColor }} />
                   Event Name: {event.name}
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{ display: "flex", alignItems: "center" }}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    color: typoColor,
+                  }}
                 >
-                  <LocationOnIcon sx={{ mr: 1 }} />
+                  <LocationOnIcon sx={{ mr: 1, color: iconColor }} />
                   Location: {event.location}
                 </Typography>
                 <Button
                   component={Link}
                   to={`/event/${event._id}`} // Link to the event details page
                   variant="text"
-                  sx={{ mt: 1 }}
+                  sx={{ mt: 1, color: typoColor }}
                 >
-                  View More
+                  View details
                 </Button>
                 <Button
-                  variant="outlined"
                   color="error"
-                  sx={{ mt: 1, ml: 2 }}
+                  sx={{ mt: 1, ml: 2, textTransform: "capitalize" }}
                   onClick={() => handleCancelClick(booking)} // Open dialog on click
                 >
                   Cancel Booking
                 </Button>
               </>
             ) : (
-              <Typography variant="body2">Loading event details...</Typography>
+              <Typography variant="body2" sx={{ color: typoColor }}>
+                Loading event details...
+              </Typography>
             )}
           </Box>
         );
