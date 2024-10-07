@@ -4,14 +4,14 @@ import cors from "cors";
 import dotenv from "dotenv";
 import eventRoutes from "./routes/eventRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
-import path from "./path";
+import path from "path"; // Uncomment this line if you need path for serving frontend
 
-dotenv.config();
+dotenv.config(); // Load environment variables from .env file
 
 const app = express();
 const port = process.env.PORT || 5000;
 
-const __dirname = path.resolve();
+const __dirname = path.resolve(); // Uncomment and use __dirname if you need to serve frontend
 
 // Middleware
 app.use(cors());
@@ -27,7 +27,8 @@ app.use(
 app.use("/api/events", eventRoutes);
 app.use("/api/bookings", bookingRoutes);
 
-if (process.env.PORT === "production") {
+// If you want to serve the frontend in production, uncomment this section
+if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "frontend/dist")));
 
   app.get("*", (req, res) => {
