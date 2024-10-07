@@ -1,11 +1,11 @@
 // src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./Pages/HomePage";
-import EventDetails from "./pages/EventDetails.jsx";
-import BookingPage from "./pages/BookingPage.jsx";
-import AdminDashboard from "./pages/AdminDashboard.jsx";
+import EventDetails from "./Pages/EventDetails.jsx";
+import BookingPage from "./Pages/BookingPage.jsx";
+import AdminDashboard from "./Pages/AdminDashboard.jsx";
 import Navbar from "./components/Navbar.jsx";
-import BookedEvents from "./pages/BookedEvents.jsx";
+import BookedEvents from "./Pages/BookedEvents.jsx";
 import EventCreation from "./components/EventCreation.jsx";
 
 function App() {
