@@ -68,7 +68,7 @@ const EventCreation = () => {
 
     try {
       const response = await axios.post(
-        "${window.location.origin}/api/events",
+        "http://localhost:5000/api/events",
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );

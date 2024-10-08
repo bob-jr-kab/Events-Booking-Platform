@@ -8,11 +8,8 @@ import {
 } from "../controllers/eventController.js";
 import dotenv from "dotenv";
 import { upload } from "../config/Multer.js";
-import { connectDB } from "../config/db.js";
 
 dotenv.config();
-
-connectDB();
 
 const router = express.Router();
 

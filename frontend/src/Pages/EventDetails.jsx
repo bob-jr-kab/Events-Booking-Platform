@@ -15,7 +15,7 @@ import AttachMoneyIcon from "@mui/icons-material/AttachMoney"; // Icon for price
 import MoneyOffIcon from "@mui/icons-material/MoneyOff"; // Icon for free events
 
 // Base URL for images stored on disk
-const BASE_URL = "${window.location.origin}"; // Update with your actual path
+const BASE_URL = "http://localhost:5000"; // Update with your actual path
 
 const EventDetails = () => {
   const { id } = useParams(); // Get the event ID from the URL

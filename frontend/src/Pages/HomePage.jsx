@@ -29,7 +29,7 @@ const HomePage = () => {
   const [selectedDate, setSelectedDate] = useState(null); // For selected date
   const calendarRef = useRef(null); // To track clicks outside calendar
 
-  const BASE_URL = "${window.location.origin}"; // Ensure this matches your backend URL
+  const BASE_URL = "http://localhost:5000"; // Ensure this matches your backend URL
 
   useEffect(() => {
     const fetchEvents = async () => {
